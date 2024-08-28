@@ -5,7 +5,14 @@ import sys
 import pymysql
 import time
 
-db = pymysql.connect(host="114.116.244.175", user="root", password="Xiaotutu20", db="ex1")
+HOST = "my-database.c7u2kc6sgxm7.ca-central-1.rds.amazonaws.com"
+USER = "admin"
+PASSWORD = "12121212"
+DB = "chatroom"
+
+SERVER_IP = '35.183.162.231'
+
+db = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=DB)
 csr = db.cursor()
 timeFormat = '%Y-%m-%d %X'
 
@@ -15,11 +22,11 @@ def send_msg(): #命令按钮的事件响应函数
     if txt == '登录':
         bt_txt.set('发送') #设置按钮文本
         t1 = time.strftime(timeFormat, time.localtime(time.time()))
-        sql1 = 'INSERT INTO messagestorage(时间, 消息) VALUES ("' + t1 + '","' + msg + "进入聊天室" + '")'
+        sql1 = 'INSERT INTO message(time, message) VALUES ("' + t1 + '","' + msg + "进入聊天室" + '")'
         csr.execute(sql1)
         db.commit()
     et_txt.set('')
-    print('msg=',msg)
+    print('消息：',msg)
     msg_b=msg.encode('utf-8') #将msg内容转化为bytes字节流并保存在msg_b
     client.sendto(msg_b, (ip, 9992)) #向服务器发送消息
     if msg.upper()[0:3]=='BYE': #判断前三个字符
@@ -34,7 +41,7 @@ def receive_msg(): #该函数为线程执行代码，用于从服务器接收消
             data_s=data_b.decode('utf-8') #将字节流数据转换为字符串
             if not data_s:
                 continue
-            print('data_s=',data_s) #调试和监测运行
+            print('数据：',data_s) #调试和监测运行
             if (':' not in data_s):
                 chat_list.insert(0,data_s + "进入了聊天室") #插入列表框第一行
             else:
@@ -45,7 +52,7 @@ def receive_msg(): #该函数为线程执行代码，用于从服务器接收消
             print('Exit!')
             break
 
-ip='127.0.0.1'
+ip=SERVER_IP
 client=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 client.connect_ex((ip,9992))
 t=threading.Thread(target=receive_msg) #创建线程，执行自定义函数receive_msg()

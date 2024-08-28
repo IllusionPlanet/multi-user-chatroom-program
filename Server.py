@@ -1,8 +1,14 @@
+# coding=utf-8
 import socketserver
 import pymysql
 import time
 
-db = pymysql.connect(host="114.116.244.175", user="root", password="Xiaotutu20", db="ex1")
+HOST = "my-database.c7u2kc6sgxm7.ca-central-1.rds.amazonaws.com"
+USER = "admin"
+PASSWORD = "12121212"
+DB = "chatroom"
+
+db = pymysql.connect(host=HOST, user=USER, password=PASSWORD, db=DB)
 csr = db.cursor()
 timeFormat = '%Y-%m-%d %X'
 
@@ -22,7 +28,7 @@ class Chat_server(socketserver.DatagramRequestHandler): #继承DatagramRequestHa
                 data_s=data_b.decode('utf-8')
                 data=name_s+': '+data_s
                 t2 = time.strftime(timeFormat, time.localtime(time.time()))
-                sql2 = 'INSERT INTO messagestorage(时间, 消息) VALUES ("' + t2 + '","' + data + '")'
+                sql2 = 'INSERT INTO message(time, message) VALUES ("' + t2 + '","' + data + '")'
                 csr.execute(sql2)
                 db.commit()
                 print('data=',data)
